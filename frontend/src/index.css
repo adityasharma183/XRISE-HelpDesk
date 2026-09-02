@@ -1,0 +1,155 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 6% 4%;
+    --foreground: 240 5% 96%;
+
+    --card: 240 6% 7%;
+    --card-foreground: 240 5% 96%;
+
+    --popover: 240 6% 7%;
+    --popover-foreground: 240 5% 96%;
+
+    --primary: 34 23% 72%;
+    --primary-foreground: 240 6% 4%;
+
+    --secondary: 240 5% 12%;
+    --secondary-foreground: 240 5% 96%;
+
+    --muted: 240 5% 14%;
+    --muted-foreground: 240 5% 65%;
+
+    --accent: 34 23% 72%;
+    --accent-foreground: 240 6% 4%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 34 15% 25%;
+    --input: 240 5% 12%;
+    --ring: 34 23% 72%;
+
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    border-color: rgba(201, 185, 166, 0.14);
+  }
+  body {
+    background-color: #0A0A0C;
+    color: #F5F5F7;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    antialiased: true;
+    overflow-x: hidden;
+  }
+  ::selection {
+    background-color: #C9B9A6;
+    color: #0A0A0C;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Newsreader', 'Playfair Display', Georgia, serif;
+    letter-spacing: -0.015em;
+  }
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Lenis Smooth Scroll Foundation */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* Accessibility: Reduced Motion overrides */
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Glass Drop Effect Utilities (Matching xriseai.com aesthetic) */
+.glass-drop-panel {
+  background: rgba(17, 17, 20, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(201, 185, 166, 0.16);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7), inset 0 1px 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.glass-drop-card {
+  background: rgba(22, 22, 27, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(201, 185, 166, 0.14);
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.65), inset 0 1px 1px 0 rgba(255, 255, 255, 0.06);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-drop-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(201, 185, 166, 0.38);
+  box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.8), inset 0 1px 2px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Dark Beige Stone / Travertine Texture Card (exact replica of hero card in user screenshot) */
+.travertine-card {
+  background: linear-gradient(145deg, #E2D7C8 0%, #C9B9A6 45%, #B5A38E 100%);
+  color: #111113;
+  box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.85), inset 0 1px 2px rgba(255, 255, 255, 0.5), inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.travertine-card-subtle {
+  background: linear-gradient(145deg, rgba(226, 215, 200, 0.15) 0%, rgba(201, 185, 166, 0.08) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(201, 185, 166, 0.22);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.ai-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(201, 185, 166, 0) 0%,
+    rgba(201, 185, 166, 0.25) 50%,
+    rgba(201, 185, 166, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
