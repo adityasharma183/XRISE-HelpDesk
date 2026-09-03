@@ -1,4 +1,4 @@
-# 🚀 XRISEAI Mini Helpdesk
+#  XRISEAI Mini Helpdesk
 
 A modern, production-grade SaaS customer support and ticketing platform built with **React 18, TypeScript, Tailwind CSS, Node.js, Express, MongoDB Atlas, JWT Authentication, Cloudinary file attachments, Nodemailer SMTP service, Google Gemini AI triage**, and **Docker containerization**.
 
@@ -39,7 +39,7 @@ A modern, production-grade SaaS customer support and ticketing platform built wi
 
 ---
 
-## 🔭 Overview
+##  Overview
 
 The **XRISEAI Mini Helpdesk** is an enterprise-ready customer support platform engineered to provide:
 1. **Public Customer Portal**: Instant ticket submission with multipart file attachments, real-time telemetry tracking, and verification-gated status lookups without requiring customer registration.
@@ -81,7 +81,7 @@ The **XRISEAI Mini Helpdesk** is an enterprise-ready customer support platform e
 
 ---
 
-## 🌟 Key Features
+##  Key Features
 
 ### 1. Core Helpdesk & Ticket Lifecycle
 - **Public Ticket Submission (`/submit-ticket`)**: Customers can log support inquiries with subject, description, priority, and optional file attachments (images, PDFs, documents).
@@ -275,7 +275,7 @@ mini-helpdesk/
 
 ---
 
-## 🗄️ Database Schema & Models
+##  Database Schema & Models
 
 ```mermaid
 erDiagram
@@ -337,7 +337,7 @@ erDiagram
 
 ---
 
-## 💻 Local Development Setup
+##  Local Development Setup
 
 ### 1. Prerequisites
 - **Node.js**: v20.x or higher
@@ -380,7 +380,7 @@ npm run dev
 
 ---
 
-## 🐳 Docker Deployment
+##  Docker Deployment
 
 To run the complete application inside Docker containers (connecting to your cloud MongoDB Atlas cluster and Cloudinary):
 
@@ -423,7 +423,7 @@ docker compose down
 
 ---
 
-## 🔐 Environment Variables (`.env.example`)
+##  Environment Variables (`.env.example`)
 
 ```ini
 # ==============================================================================
@@ -469,7 +469,7 @@ CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 
 ---
 
-## 📡 API Reference
+##  API Reference
 
 ### Health
 - `GET /api/health` — Check system telemetry, uptime, and database status.
@@ -500,7 +500,7 @@ CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 
 ---
 
-## 🧪 Automated Testing
+##  Automated Testing
 
 The project includes an end-to-end Vitest test suite validating controllers, services, RBAC query scoping, AI safeguards, and schema validation:
 
@@ -515,14 +515,14 @@ npm run build --workspace=frontend
 
 ---
 
-## 🔑 Demo Credentials
+## Demo Credentials
 
 | Role | Name | Email | Password | Access Scope |
 |---|---|---|---|---|
-| **👑 ADMIN** | System Admin | `admin@xriseai.com` | `admin@123` | Global ticket queue, agent reassignments, staff roster, all replies |
-| **🛡️ AGENT 1** | Aarav Sharma | `agent1@xriseai.com` | `agent1@123` | Assigned tickets, reply composer, AI assistant, status controls |
-| **🛡️ AGENT 2** | Ananya Patel | `agent2@xriseai.com` | `agent2@123` | Assigned tickets, reply composer, AI assistant, status controls |
-| **🛡️ AGENT 3** | Rohan Verma | `agent3@xriseai.com` | `agent3@123` | Assigned tickets, reply composer, AI assistant, status controls |
+| ** ADMIN** | System Admin | `admin@xriseai.com` | `admin@123` | Global ticket queue, agent reassignments, staff roster, all replies |
+| ** AGENT 1** | Aarav Sharma | `agent1@xriseai.com` | `agent1@123` | Assigned tickets, reply composer, AI assistant, status controls |
+| ** AGENT 2** | Ananya Patel | `agent2@xriseai.com` | `agent2@123` | Assigned tickets, reply composer, AI assistant, status controls |
+| ** AGENT 3** | Rohan Verma | `agent3@xriseai.com` | `agent3@123` | Assigned tickets, reply composer, AI assistant, status controls |
 
 ---
 
