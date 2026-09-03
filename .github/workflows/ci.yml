@@ -1,0 +1,39 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate:
+    name: Lint & Test Suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Linting (Workspaces)
+        run: npm run lint
+
+      - name: Run Test Suite (Backend & Frontend)
+        run: npm test
+        env:
+          NODE_ENV: test
+          PORT: 8000
+          MONGODB_URI: mongodb://localhost:27017/mini_helpdesk_test
+          JWT_SECRET: test_jwt_secret_key_minimum_32_characters_long_12345
+          COOKIE_NAME: helpdesk_auth_token
