@@ -4,7 +4,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { EvaluationAccess } from '../src/features/public-portal/components/EvaluationAccess';
 import {
-  PREDEFINED_STAFF_ACCOUNTS,
   MASTER_ADMIN_ACCOUNT,
   SUPPORT_STAFF_ACCOUNTS,
 } from '../src/config/staffAccounts';
@@ -23,7 +22,7 @@ describe('EvaluationAccess Component', () => {
 
     expect(screen.getAllByText(/EVALUATION ACCESS/i).length).toBeGreaterThan(0);
     expect(
-      screen.getByText('Pre-configured accounts for evaluating the XRISEHelpDesk staff portal.')
+      screen.getByText('One-click evaluation credentials. Copy username and password independently to sign in to the agent portal.')
     ).toBeInTheDocument();
   });
 
@@ -37,7 +36,6 @@ describe('EvaluationAccess Component', () => {
     expect(screen.getByText(MASTER_ADMIN_ACCOUNT.name)).toBeInTheDocument();
     expect(screen.getByText(MASTER_ADMIN_ACCOUNT.email)).toBeInTheDocument();
     expect(screen.getAllByText(MASTER_ADMIN_ACCOUNT.role).length).toBeGreaterThan(0);
-    expect(screen.getByText(MASTER_ADMIN_ACCOUNT.roleBadge)).toBeInTheDocument();
   });
 
   it('renders all support staff accounts dynamically', () => {
@@ -47,8 +45,8 @@ describe('EvaluationAccess Component', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText('SUPPORT STAFF')).toBeInTheDocument();
-    expect(screen.getByText(`${SUPPORT_STAFF_ACCOUNTS.length} Active Agents`)).toBeInTheDocument();
+    expect(screen.getByText('Support & Triage Staff')).toBeInTheDocument();
+    expect(screen.getByText(`${SUPPORT_STAFF_ACCOUNTS.length} Assigned Agents`)).toBeInTheDocument();
 
     for (const agent of SUPPORT_STAFF_ACCOUNTS) {
       expect(screen.getByText(agent.name)).toBeInTheDocument();
@@ -85,7 +83,7 @@ describe('EvaluationAccess Component', () => {
     expect(screen.getByText('agent1@123')).toBeInTheDocument();
   });
 
-  it('copies credentials to clipboard and shows feedback', async () => {
+  it('copies username and password independently to clipboard and shows feedback', async () => {
     const writeTextMock = vi.fn().mockResolvedValue(undefined);
     Object.assign(navigator, {
       clipboard: {
@@ -99,13 +97,24 @@ describe('EvaluationAccess Component', () => {
       </BrowserRouter>
     );
 
-    const adminCopyBtn = screen.getByLabelText(`Copy credentials for ${MASTER_ADMIN_ACCOUNT.name}`);
-    fireEvent.click(adminCopyBtn);
+    // 1. Test independent username copy
+    const adminCopyUserBtn = screen.getByLabelText(`Copy username for ${MASTER_ADMIN_ACCOUNT.name}`);
+    fireEvent.click(adminCopyUserBtn);
 
-    expect(writeTextMock).toHaveBeenCalledWith('Email: admin@xriseai.com\nPassword: admin@123');
+    expect(writeTextMock).toHaveBeenCalledWith('admin@xriseai.com');
 
     await waitFor(() => {
-      expect(screen.getByText('✓ Copied')).toBeInTheDocument();
+      expect(screen.getByText('Copied User')).toBeInTheDocument();
+    });
+
+    // 2. Test independent password copy
+    const adminCopyPassBtn = screen.getByLabelText(`Copy password for ${MASTER_ADMIN_ACCOUNT.name}`);
+    fireEvent.click(adminCopyPassBtn);
+
+    expect(writeTextMock).toHaveBeenCalledWith('admin@123');
+
+    await waitFor(() => {
+      expect(screen.getByText('Copied Pass')).toBeInTheDocument();
     });
   });
 });
