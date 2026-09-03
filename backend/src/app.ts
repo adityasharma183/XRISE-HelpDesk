@@ -4,8 +4,10 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { pinoHttp } from 'pino-http';
 import { nanoid } from 'nanoid';
+import swaggerUi from 'swagger-ui-express';
 import { env } from './config/env.js';
 import { logger } from './config/logger.js';
+import { swaggerSpec } from './config/swagger.js';
 import { apiLimiter } from './middleware/rateLimiter.js';
 import { notFoundHandler } from './middleware/notFound.js';
 import { errorHandler } from './middleware/errorHandler.js';
@@ -14,8 +16,12 @@ import { apiRoutes } from './routes/index.js';
 export function createApp() {
   const app = express();
 
-  // Security Headers
-  app.use(helmet());
+  // Security Headers (relaxed CSP to ensure Swagger UI assets and scripts render cleanly)
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+    })
+  );
 
   // Strict CORS Policy
   app.use(
@@ -43,6 +49,7 @@ export function createApp() {
       version: '1.0.0',
       frontendUrl: env.CLIENT_URL,
       healthCheck: '/api/health',
+      docs: '/api-docs',
       endpoints: {
         publicTickets: '/api/public/tickets',
         publicStatus: '/api/public/tickets/status',
@@ -50,6 +57,13 @@ export function createApp() {
         tickets: '/api/tickets',
       },
     });
+  });
+
+  // Swagger UI & OpenAPI Specification (Available in all environments)
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.get('/api-docs.json', (_req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.json(swaggerSpec);
   });
 
   // Structured HTTP Request Logging with correlation ID
@@ -63,7 +77,11 @@ export function createApp() {
         return 'info';
       },
       autoLogging: {
-        ignore: (req) => req.url === '/api/health' || req.url === '/favicon.ico' || env.NODE_ENV === 'test',
+        ignore: (req) =>
+          req.url === '/api/health' ||
+          req.url === '/favicon.ico' ||
+          req.url?.startsWith('/api-docs') ||
+          env.NODE_ENV === 'test',
       },
     })
   );

@@ -29,6 +29,7 @@ export class TicketView {
           }
         : null,
       closedAt: ticket.closedAt ? new Date(ticket.closedAt).toISOString() : null,
+      attachments: ticket.attachments || [],
       createdAt: new Date(ticket.createdAt).toISOString(),
       updatedAt: new Date(ticket.updatedAt).toISOString(),
       latestReply: latestReply
@@ -36,6 +37,7 @@ export class TicketView {
             senderType: latestReply.senderType,
             senderName: latestReply.senderName,
             body: latestReply.body,
+            attachments: latestReply.attachments || [],
             createdAt: new Date(latestReply.createdAt).toISOString(),
           }
         : null,
@@ -76,6 +78,7 @@ export class TicketView {
             senderType: latestReply.senderType,
             senderName: latestReply.senderName,
             body: latestReply.body,
+            attachments: latestReply.attachments || [],
             createdAt: new Date(latestReply.createdAt).toISOString(),
           }
         : null,
@@ -91,6 +94,7 @@ export class TicketView {
         senderName: m.senderName,
         senderId: m.senderId ? m.senderId.toString() : null,
         body: m.body,
+        attachments: m.attachments || [],
         createdAt: new Date(m.createdAt).toISOString(),
       })),
       events: events.map((e) => ({

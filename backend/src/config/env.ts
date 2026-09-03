@@ -27,7 +27,8 @@ dotenv.config();
  */
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  PORT: z.coerce.number().default(5001),
+  PORT: z.coerce.number().default(8000),
+  API_BASE_URL: z.string().url().default('http://localhost:8000'),
   CLIENT_URL: z.string().url().default('http://localhost:5173'),
   MONGODB_URI: z
     .string({ required_error: 'MONGODB_URI is required' })
@@ -50,6 +51,11 @@ const envSchema = z.object({
 
   // Optional Gemini API key for AI-powered ticket features
   GEMINI_API_KEY: z.string().optional().default(''),
+
+  // Cloudinary — required only when attachments are uploaded
+  CLOUDINARY_CLOUD_NAME: z.string().optional().default(''),
+  CLOUDINARY_API_KEY: z.string().optional().default(''),
+  CLOUDINARY_API_SECRET: z.string().optional().default(''),
 
   // Rate limiting — tuned per-route via middleware, these are global defaults
   RATE_LIMIT_WINDOW_MS: z.coerce.number().default(15 * 60 * 1000), // 15 minutes

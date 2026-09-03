@@ -18,7 +18,7 @@ async function startServer() {
     server.on('error', (err: any) => {
       if (err.code === 'EADDRINUSE') {
         logger.fatal(
-          `❌ Port ${env.PORT} is already in use (on macOS, port 5000 is used by AirPlay Receiver). Please set PORT=5001 in .env.`
+          `❌ Port ${env.PORT} is already in use. Please ensure port ${env.PORT} is free or configure PORT in .env.`
         );
       } else {
         logger.fatal({ err }, 'Server listen error');

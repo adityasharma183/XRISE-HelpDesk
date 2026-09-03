@@ -8,6 +8,7 @@ import {
   TicketResponseDto,
   PublicTicketStatusResponseDto,
   ITicketDocument,
+  IAttachmentMeta,
 } from '../types/ticket.types.js';
 import {
   CreateTicketInput,
@@ -17,6 +18,7 @@ import { IUserDocument } from '../types/user.types.js';
 import { TicketView } from '../views/ticket.view.js';
 import { AiService } from '../modules/ai/index.js';
 import { emailService } from './email.service.js';
+import { UploadService } from './upload.service.js';
 
 export class TicketService {
   /**
@@ -25,10 +27,16 @@ export class TicketService {
    * Generates a unique tracking ID (e.g. XR-9A2K4B), records initial conversation payload,
    * and logs an immutable audit event for compliance.
    */
-  static async createPublicTicket(input: CreateTicketInput): Promise<{ ticketId: string; subject: string }> {
+  static async createPublicTicket(
+    input: CreateTicketInput,
+    files?: Express.Multer.File[]
+  ): Promise<{ ticketId: string; subject: string }> {
     const ticketId = generateTicketId();
+    const attachments: IAttachmentMeta[] = files && files.length > 0
+      ? await UploadService.uploadFiles(files)
+      : [];
 
-    const ticket = await TicketRepository.createTicket({
+    await TicketRepository.createTicket({
       ticketId,
       customer: {
         name: input.name,
@@ -39,6 +47,7 @@ export class TicketService {
       priority: input.priority,
       status: 'OPEN',
       assignee: null,
+      attachments,
     });
 
     // Save the initial customer submission into the message history
@@ -47,6 +56,7 @@ export class TicketService {
       senderType: 'CUSTOMER',
       senderName: input.name,
       body: input.body,
+      attachments,
     });
 
     // Record CREATED audit event for compliance and chronological tracking
@@ -65,9 +75,11 @@ export class TicketService {
 
     logger.info({ ticketId, customerEmail: input.email }, 'Public support ticket created');
 
+    // Return only ticketId and subject — the ticket object itself isn't needed by the public form
+    const ticket = await TicketRepository.findByTicketId(ticketId);
     return {
-      ticketId: ticket.ticketId,
-      subject: ticket.subject,
+      ticketId: ticket!.ticketId,
+      subject: ticket!.subject,
     };
   }
 
@@ -152,8 +164,16 @@ export class TicketService {
   /**
    * 6. Agent / Admin Reply
    */
-  static async addReply(ticketId: string, body: string, user: IUserDocument) {
+  static async addReply(
+    ticketId: string,
+    body: string,
+    user: IUserDocument,
+    files?: Express.Multer.File[]
+  ) {
     const ticket = await this.getTicketById(ticketId, user);
+    const attachments: IAttachmentMeta[] = files && files.length > 0
+      ? await UploadService.uploadFiles(files)
+      : [];
 
     const message = await TicketRepository.createMessage({
       ticketId: ticket.ticketId,
@@ -161,6 +181,7 @@ export class TicketService {
       senderId: user._id,
       senderName: user.name,
       body,
+      attachments,
     });
 
     await TicketRepository.createEvent({
@@ -188,6 +209,7 @@ export class TicketService {
       senderId: user._id.toString(),
       senderName: user.name,
       body: message.body,
+      attachments: message.attachments ?? [],
       createdAt: message.createdAt.toISOString(),
     };
   }
@@ -403,9 +425,13 @@ export class TicketService {
       priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
       assigneeId?: string | null;
     },
-    creatorUser: IUserDocument
+    creatorUser: IUserDocument,
+    files?: Express.Multer.File[]
   ) {
     const ticketId = generateTicketId();
+    const attachments: IAttachmentMeta[] = files && files.length > 0
+      ? await UploadService.uploadFiles(files)
+      : [];
 
     let assigneeObjectId: Types.ObjectId | null = null;
     let targetUser: any = null;
@@ -436,6 +462,7 @@ export class TicketService {
       priority: input.priority,
       status: 'OPEN',
       assignee: assigneeObjectId,
+      attachments,
     });
 
     // Create initial message
@@ -444,6 +471,7 @@ export class TicketService {
       senderType: 'CUSTOMER',
       senderName: input.name,
       body: input.body,
+      attachments,
     });
 
     // Record CREATED audit event

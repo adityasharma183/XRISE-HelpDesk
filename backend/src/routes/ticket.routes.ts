@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { TicketController } from '../controllers/ticket.controller.js';
 import { validate } from '../middleware/validate.js';
-
+import { upload } from '../middleware/upload.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import {
   createTicketSchema,
@@ -27,6 +27,7 @@ const publicRouter = Router();
 publicRouter.post(
   '/tickets',
   publicTicketCreateLimiter,
+  upload.array('attachments', 5),
   validate({ body: createTicketSchema }),
   asyncHandler(TicketController.createPublicTicket)
 );
@@ -51,6 +52,7 @@ ticketRouter.get(
 
 ticketRouter.post(
   '/',
+  upload.array('attachments', 5),
   validate({ body: createInternalTicketSchema }),
   asyncHandler(TicketController.createInternalTicket)
 );
@@ -69,6 +71,7 @@ ticketRouter.get(
 
 ticketRouter.post(
   '/:ticketId/replies',
+  upload.array('attachments', 5),
   validate({ params: ticketIdParamSchema, body: addReplySchema }),
   asyncHandler(TicketController.addReply)
 );

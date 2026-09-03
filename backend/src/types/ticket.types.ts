@@ -11,6 +11,14 @@ export interface ITicketCustomer {
   email: string;
 }
 
+export interface IAttachmentMeta {
+  url: string;
+  publicId: string;
+  fileName: string;
+  mimeType: string;
+  size: number;
+}
+
 export interface ITicketAiAnalysisCache {
   category: string;
   suggestedPriority: string;
@@ -46,6 +54,7 @@ export interface ITicket {
   assignee?: Types.ObjectId | null;
   closedAt?: Date | null;
   aiCache?: ITicketAiCache | null;
+  attachments?: IAttachmentMeta[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -61,6 +70,7 @@ export interface ITicketMessage {
   senderId?: Types.ObjectId | null;
   senderName: string;
   body: string;
+  attachments?: IAttachmentMeta[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -98,12 +108,14 @@ export interface TicketResponseDto {
   status: TicketStatus;
   assignee?: UserResponseDto | null;
   closedAt?: string | null;
+  attachments?: IAttachmentMeta[];
   createdAt: string;
   updatedAt: string;
   latestReply?: {
     senderType: MessageSenderType;
     senderName: string;
     body: string;
+    attachments?: IAttachmentMeta[];
     createdAt: string;
   } | null;
 }
@@ -119,6 +131,7 @@ export interface PublicTicketStatusResponseDto {
     senderType: MessageSenderType;
     senderName: string;
     body: string;
+    attachments?: IAttachmentMeta[];
     createdAt: string;
   } | null;
 }

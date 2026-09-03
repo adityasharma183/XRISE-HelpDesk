@@ -5,7 +5,8 @@ import { ApiResponse } from '../utils/apiResponse.js';
 export class TicketController {
   // Public ticket submission
   static async createPublicTicket(req: Request, res: Response) {
-    const result = await TicketService.createPublicTicket(req.body);
+    const files = req.files as Express.Multer.File[] | undefined;
+    const result = await TicketService.createPublicTicket(req.body, files);
     return ApiResponse.success(res, result, 201);
   }
 
@@ -48,7 +49,8 @@ export class TicketController {
   static async addReply(req: Request, res: Response) {
     const { ticketId } = req.params;
     const { body } = req.body;
-    const message = await TicketService.addReply(ticketId!, body, req.user!);
+    const files = req.files as Express.Multer.File[] | undefined;
+    const message = await TicketService.addReply(ticketId!, body, req.user!, files);
     return ApiResponse.success(res, message, 201);
   }
 
@@ -70,7 +72,8 @@ export class TicketController {
 
   // Admin / Staff internal ticket creation
   static async createInternalTicket(req: Request, res: Response) {
-    const result = await TicketService.createInternalTicket(req.body, req.user!);
+    const files = req.files as Express.Multer.File[] | undefined;
+    const result = await TicketService.createInternalTicket(req.body, req.user!, files);
     return ApiResponse.success(res, result, 201);
   }
 

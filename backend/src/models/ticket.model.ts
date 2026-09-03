@@ -1,6 +1,17 @@
 import mongoose, { Schema, model } from 'mongoose';
 import { ITicketDocument } from '../types/ticket.types.js';
 
+const attachmentSchema = new Schema(
+  {
+    url:       { type: String, required: true },
+    publicId:  { type: String, required: true },
+    fileName:  { type: String, required: true },
+    mimeType:  { type: String, required: true },
+    size:      { type: Number, required: true },
+  },
+  { _id: false }
+);
+
 const ticketCustomerSchema = new Schema(
   {
     name: {
@@ -78,6 +89,10 @@ const ticketSchema = new Schema<ITicketDocument>(
         type: Schema.Types.Mixed,
         default: null,
       },
+    },
+    attachments: {
+      type: [attachmentSchema],
+      default: [],
     },
   },
   {
