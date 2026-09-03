@@ -56,8 +56,12 @@ export function useCreateInternalTicketMutation(options?: {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: SubmitTicketFormData & { assigneeId?: string | null }) =>
-      ticketApi.createInternalTicket(data),
+    mutationFn: (payload: (SubmitTicketFormData & { assigneeId?: string | null }) | { data: SubmitTicketFormData & { assigneeId?: string | null }; files?: File[] }) => {
+      if ('data' in payload) {
+        return ticketApi.createInternalTicket(payload.data, payload.files);
+      }
+      return ticketApi.createInternalTicket(payload);
+    },
     onSuccess: (newTicket) => {
       queryClient.invalidateQueries({ queryKey: ticketKeys.all });
       options?.onSuccess?.(newTicket);
@@ -78,7 +82,12 @@ export function useAddReplyMutation(
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (body: string) => ticketApi.addReply(ticketId, body),
+    mutationFn: (payload: string | { body: string; files?: File[] }) => {
+      if (typeof payload === 'string') {
+        return ticketApi.addReply(ticketId, payload);
+      }
+      return ticketApi.addReply(ticketId, payload.body, payload.files);
+    },
     onSuccess: (msg) => {
       toast.success('Reply submitted to customer');
       queryClient.invalidateQueries({ queryKey: ticketKeys.timeline(ticketId) });

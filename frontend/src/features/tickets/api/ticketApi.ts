@@ -17,7 +17,23 @@ import {
 
 export const ticketApi = {
   // Public
-  submitPublicTicket: async (data: SubmitTicketFormData): Promise<{ ticketId: string; subject: string }> => {
+  submitPublicTicket: async (
+    data: SubmitTicketFormData,
+    files?: File[]
+  ): Promise<{ ticketId: string; subject: string }> => {
+    if (files && files.length > 0) {
+      const formData = new FormData();
+      formData.append('name', data.name);
+      formData.append('email', data.email);
+      formData.append('subject', data.subject);
+      formData.append('body', data.body);
+      formData.append('priority', data.priority);
+      files.forEach((file) => formData.append('attachments', file));
+
+      const res = await apiClient.post('/public/tickets', formData);
+      return res.data.data;
+    }
+
     const res = await apiClient.post('/public/tickets', data);
     return res.data.data;
   },
@@ -28,14 +44,33 @@ export const ticketApi = {
   },
 
   // Internal (Agent & Admin)
-  createInternalTicket: async (data: {
-    name: string;
-    email: string;
-    subject: string;
-    body: string;
-    priority: TicketPriority;
-    assigneeId?: string | null;
-  }): Promise<Ticket> => {
+  createInternalTicket: async (
+    data: {
+      name: string;
+      email: string;
+      subject: string;
+      body: string;
+      priority: TicketPriority;
+      assigneeId?: string | null;
+    },
+    files?: File[]
+  ): Promise<Ticket> => {
+    if (files && files.length > 0) {
+      const formData = new FormData();
+      formData.append('name', data.name);
+      formData.append('email', data.email);
+      formData.append('subject', data.subject);
+      formData.append('body', data.body);
+      formData.append('priority', data.priority);
+      if (data.assigneeId) {
+        formData.append('assigneeId', data.assigneeId);
+      }
+      files.forEach((file) => formData.append('attachments', file));
+
+      const res = await apiClient.post('/tickets', formData);
+      return res.data.data;
+    }
+
     const res = await apiClient.post('/tickets', data);
     return res.data.data;
   },
@@ -67,7 +102,16 @@ export const ticketApi = {
     return res.data.data;
   },
 
-  addReply: async (ticketId: string, body: string): Promise<TicketMessage> => {
+  addReply: async (ticketId: string, body: string, files?: File[]): Promise<TicketMessage> => {
+    if (files && files.length > 0) {
+      const formData = new FormData();
+      formData.append('body', body);
+      files.forEach((file) => formData.append('attachments', file));
+
+      const res = await apiClient.post(`/tickets/${ticketId}/replies`, formData);
+      return res.data.data;
+    }
+
     const res = await apiClient.post(`/tickets/${ticketId}/replies`, { body });
     return res.data.data;
   },

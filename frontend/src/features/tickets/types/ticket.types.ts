@@ -10,6 +10,14 @@ export interface TicketCustomer {
   email: string;
 }
 
+export interface AttachmentMeta {
+  url: string;
+  publicId: string;
+  fileName: string;
+  mimeType: string;
+  size: number;
+}
+
 export interface TicketMessage {
   id: string;
   ticketId: string;
@@ -17,6 +25,7 @@ export interface TicketMessage {
   senderId?: string | null;
   senderName: string;
   body: string;
+  attachments?: AttachmentMeta[];
   createdAt: string;
 }
 
@@ -42,12 +51,14 @@ export interface Ticket {
   status: TicketStatus;
   assignee?: User | null;
   closedAt?: string | null;
+  attachments?: AttachmentMeta[];
   createdAt: string;
   updatedAt: string;
   latestReply?: {
     senderType: MessageSenderType;
     senderName: string;
     body: string;
+    attachments?: AttachmentMeta[];
     createdAt: string;
   } | null;
 }
@@ -80,6 +91,7 @@ export interface PublicTicketStatus {
     senderType: MessageSenderType;
     senderName: string;
     body: string;
+    attachments?: AttachmentMeta[];
     createdAt: string;
   } | null;
 }

@@ -4,6 +4,7 @@ export * from './api/ticketApi';
 export * from './hooks/useTickets';
 export * from './components/TicketStatusBadge';
 export * from './components/TicketPriorityBadge';
+export * from './components/TicketProgressTracker';
 export * from './components/TicketCard';
 export * from './components/TicketTimeline';
 export * from './components/TicketReplyBox';

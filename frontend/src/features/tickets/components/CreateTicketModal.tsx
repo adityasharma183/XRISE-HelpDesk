@@ -9,6 +9,7 @@ import { useCreateInternalTicketMutation } from '../hooks/useTickets';
 import { useAgentsQuery } from '../../agents/hooks/useAgents';
 import { Input } from '../../../components/ui/Input';
 import { Textarea } from '../../../components/ui/Textarea';
+import { FileUploadInput } from '../../../components/ui/FileUploadInput';
 
 interface CreateTicketModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ interface CreateTicketModalProps {
 export function CreateTicketModal({ isOpen, onClose }: CreateTicketModalProps) {
   const { user } = useAuthStore();
   const [selectedAssigneeId, setSelectedAssigneeId] = useState<string>('');
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   // Fetch agents if Admin
   const { data: agents } = useAgentsQuery(isOpen && user?.role === 'ADMIN');
@@ -52,6 +54,7 @@ export function CreateTicketModal({ isOpen, onClose }: CreateTicketModalProps) {
       );
       reset();
       setSelectedAssigneeId('');
+      setSelectedFiles([]);
       onClose();
     },
     onError: (err: any) => {
@@ -100,7 +103,19 @@ export function CreateTicketModal({ isOpen, onClose }: CreateTicketModalProps) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit((data) => createMutation.mutate(data))} className="space-y-5 relative z-10" noValidate>
+        <form
+          onSubmit={handleSubmit((data) =>
+            createMutation.mutate({
+              data: {
+                ...data,
+                assigneeId: selectedAssigneeId || undefined,
+              },
+              files: selectedFiles,
+            })
+          )}
+          className="space-y-5 relative z-10"
+          noValidate
+        >
           {/* Admin Agent Assignment Selector with Glass Drop */}
           {user?.role === 'ADMIN' && (
             <div className="p-4 rounded-md bg-[#16161C]/80 border border-[#C9B9A6]/25 space-y-2 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.06)]">
@@ -190,6 +205,12 @@ export function CreateTicketModal({ isOpen, onClose }: CreateTicketModalProps) {
             placeholder="Detailed description of what needs to be solved or investigated..."
             error={errors.body?.message}
             {...register('body')}
+          />
+
+          {/* File Attachments */}
+          <FileUploadInput
+            files={selectedFiles}
+            onFilesChange={setSelectedFiles}
           />
 
           {/* Footer */}
