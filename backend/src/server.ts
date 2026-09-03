@@ -1,14 +1,21 @@
+import http from 'http';
 import { createApp } from './app.js';
 import { connectDatabase, disconnectDatabase } from './config/database.js';
 import { env } from './config/env.js';
 import { logger } from './config/logger.js';
+import { initSocketServer } from './socket/index.js';
 
 async function startServer() {
   try {
     await connectDatabase();
 
     const app = createApp();
-    const server = app.listen(env.PORT, () => {
+    const server = http.createServer(app);
+
+    // Mount Socket.IO on the same HTTP server
+    initSocketServer(server);
+
+    server.listen(env.PORT, () => {
       logger.info(
         { port: env.PORT, env: env.NODE_ENV, clientUrl: env.CLIENT_URL },
         `🚀 Mini Helpdesk Backend server running at http://localhost:${env.PORT}`

@@ -10,11 +10,13 @@ import {
 import {
   PublicTicketStatus,
 } from '../../features/tickets/types/ticket.types';
+import { useTicketSocket } from '../../features/tickets';
 import { ScrollReveal } from '../../components/common/ScrollReveal';
 
 export function CheckStatusPage() {
   const [ticketStatus, setTicketStatus] = useState<PublicTicketStatus | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [currentEmail, setCurrentEmail] = useState<string>('');
 
   const checkMutation = useCheckPublicStatusMutation({
     onSuccess: (res) => {
@@ -27,9 +29,26 @@ export function CheckStatusPage() {
     },
   });
 
+  // Real-time synchronization for customer viewing this ticket
+  useTicketSocket({
+    ticketId: ticketStatus?.ticketId,
+    email: currentEmail,
+    onStatusChanged: () => {
+      if (ticketStatus?.ticketId && currentEmail) {
+        checkMutation.mutate({ ticketId: ticketStatus.ticketId, email: currentEmail });
+      }
+    },
+    onReplyAdded: () => {
+      if (ticketStatus?.ticketId && currentEmail) {
+        checkMutation.mutate({ ticketId: ticketStatus.ticketId, email: currentEmail });
+      }
+    },
+  });
+
   const onSubmit = (formData: CheckStatusFormData) => {
     setErrorMessage(null);
     setTicketStatus(null);
+    setCurrentEmail(formData.email);
     checkMutation.mutate(formData);
   };
 

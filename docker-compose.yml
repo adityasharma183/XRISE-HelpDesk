@@ -49,7 +49,7 @@ services:
       dockerfile: frontend/Dockerfile
 
       args:
-        VITE_API_URL: ""
+        VITE_API_URL: "http://localhost:5001"
 
     container_name: mini-helpdesk-frontend
     restart: unless-stopped

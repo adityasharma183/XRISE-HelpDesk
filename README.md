@@ -24,9 +24,10 @@ A modern, production-grade SaaS customer support and ticketing platform built wi
   - [1. Core Helpdesk & Ticket Lifecycle](#1-core-helpdesk--ticket-lifecycle)
   - [2. Authentication, Security & RBAC](#2-authentication-security--rbac)
   - [3. Cloudinary & Multer File Attachments](#3-cloudinary--multer-file-attachments)
-  - [4. Google Gemini AI Assistant Layer](#4-google-gemini-ai-assistant-layer)
-  - [5. Nodemailer Transactional Email Service](#5-nodemailer-transactional-email-service)
-  - [6. Interactive Swagger / OpenAPI Documentation](#6-interactive-swagger--openapi-documentation)
+  - [4. Socket.IO Real-Time Ticket Updates](#4-socketio-real-time-ticket-updates)
+  - [5. Google Gemini AI Assistant Layer](#5-google-gemini-ai-assistant-layer)
+  - [6. Nodemailer Transactional Email Service](#6-nodemailer-transactional-email-service)
+  - [7. Interactive Swagger / OpenAPI Documentation](#7-interactive-swagger--openapi-documentation)
 - [Port Architecture & Network Mapping](#-port-architecture--network-mapping)
 - [Project Structure](#-project-structure)
 - [Database Schema & Models](#-database-schema--models)
@@ -138,9 +139,28 @@ The application features an end-to-end cloud storage pipeline for ticket attachm
 - **Supported Formats**: Images (`image/jpeg`, `image/png`, `image/webp`), Documents (`application/pdf`, `text/plain`, `text/csv`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document`).
 - **Credential Protection**: Cloudinary credentials (`CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`) are read exclusively from environment variables with zero hardcoding in source files.
 
+### 4. Socket.IO Real-Time Ticket Updates
+
+The platform includes a real-time event broadcasting layer using **Socket.IO**:
+
+```
+[REST API Mutation] ──► [MongoDB Committed] ──► [SocketEmitter] ──► [Socket.IO Rooms] ──► [React Query Cache Sync]
+```
+
+- **Room Architecture & Access Control**:
+  - `ticket:<ticketId>`: Dedicated room for each ticket. Joined by Admin, assigned Agent, or verified customer.
+  - `agent:dashboard`: Joined by authenticated staff for live queue and metric updates.
+- **Event Contracts**:
+  - `ticket:created`: Broadcasts new ticket details to `agent:dashboard`.
+  - `ticket:status-changed`: Broadcasts status updates to `ticket:<ticketId>` and `agent:dashboard`.
+  - `ticket:priority-changed`: Broadcasts priority changes.
+  - `ticket:assigned`: Broadcasts agent assignment changes.
+  - `ticket:reply-added`: Broadcasts customer and agent replies with file attachments.
+- **Graceful Degradation**: If WebSockets disconnect, the entire application remains 100% functional via standard REST APIs and auto-reconnects with exponential backoff.
+
 ---
 
-### 4. Google Gemini AI Assistant Layer
+### 5. Google Gemini AI Assistant Layer
 
 The AI Support Assistant provides real-time productivity tooling for agents:
 

@@ -11,6 +11,7 @@ export * from './components/TicketReplyBox';
 export * from './components/AiAssistantPanel';
 export * from './components/ReassignTicketModal';
 export * from './components/CreateTicketModal';
+export * from './hooks/useTicketSocket';
 
 
 

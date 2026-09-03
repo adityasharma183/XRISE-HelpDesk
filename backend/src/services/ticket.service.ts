@@ -19,6 +19,7 @@ import { TicketView } from '../views/ticket.view.js';
 import { AiService } from '../modules/ai/index.js';
 import { emailService } from './email.service.js';
 import { UploadService } from './upload.service.js';
+import { socketEmitter } from '../socket/index.js';
 
 export class TicketService {
   /**
@@ -75,8 +76,11 @@ export class TicketService {
 
     logger.info({ ticketId, customerEmail: input.email }, 'Public support ticket created');
 
-    // Return only ticketId and subject — the ticket object itself isn't needed by the public form
     const ticket = await TicketRepository.findByTicketId(ticketId);
+    if (ticket) {
+      socketEmitter.emitTicketCreated(TicketView.renderTicket(ticket, null));
+    }
+
     return {
       ticketId: ticket!.ticketId,
       subject: ticket!.subject,
@@ -202,7 +206,7 @@ export class TicketService {
     // Invalidate cached AI summary on new conversation activity
     await TicketRepository.invalidateAiSummary(ticket.ticketId);
 
-    return {
+    const replyPayload = {
       id: message._id.toString(),
       ticketId: message.ticketId,
       senderType: message.senderType,
@@ -212,6 +216,10 @@ export class TicketService {
       attachments: message.attachments ?? [],
       createdAt: message.createdAt.toISOString(),
     };
+
+    socketEmitter.emitReplyAdded(ticket.ticketId, replyPayload);
+
+    return replyPayload;
   }
 
   /**
@@ -272,7 +280,10 @@ export class TicketService {
       }
     }
 
-    return this.getTicketById(ticketId, user);
+    const updatedTicket = await this.getTicketById(ticketId, user);
+    socketEmitter.emitStatusChanged(ticket.ticketId, previousStatus, newStatus, updatedTicket);
+
+    return updatedTicket;
   }
 
   /**
@@ -366,7 +377,9 @@ export class TicketService {
         },
       });
 
-      return this.getTicketById(ticketId, adminUser);
+      const updatedTicket = await this.getTicketById(ticketId, adminUser);
+      socketEmitter.emitTicketAssigned(ticket.ticketId, previousAssigneeName, null, updatedTicket);
+      return updatedTicket;
     }
 
     const targetUser = await UserModel.findById(targetAssigneeId);
@@ -410,7 +423,9 @@ export class TicketService {
       'Ticket reassigned successfully by Admin'
     );
 
-    return this.getTicketById(ticketId, adminUser);
+    const updatedTicket = await this.getTicketById(ticketId, adminUser);
+    socketEmitter.emitTicketAssigned(ticket.ticketId, previousAssigneeName, updatedTicket.assignee, updatedTicket);
+    return updatedTicket;
   }
 
   /**
@@ -512,7 +527,10 @@ export class TicketService {
       'Internal support ticket created by staff'
     );
 
-    return this.getTicketById(ticketId, creatorUser);
+    const createdTicket = await this.getTicketById(ticketId, creatorUser);
+    socketEmitter.emitTicketCreated(createdTicket);
+
+    return createdTicket;
   }
 
   /**

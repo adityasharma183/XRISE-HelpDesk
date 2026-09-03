@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useAuthStore } from '../../features/auth/store/authStore';
 import { useTicketsQuery } from '../../features/tickets/hooks/useTickets';
 import { Plus, Search } from 'lucide-react';
-import { DashboardHeader } from '../../features/dashboard/components/DashboardHeader';
-import { DashboardMetricsGrid } from '../../features/dashboard/components/DashboardMetricsGrid';
+import { DashboardHeader, DashboardMetricsGrid, useDashboardSocket } from '../../features/dashboard';
 import { TicketCard } from '../../features/tickets/components/TicketCard';
 import { TableLoadingSkeleton } from '../../components/common/LoadingSkeleton';
 import { EmptyState } from '../../components/common/EmptyState';
@@ -15,6 +14,9 @@ export function DashboardPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'ALL' | 'OPEN' | 'IN_PROGRESS' | 'RESOLVED'>('ALL');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  // Real-time Dashboard WebSocket synchronization
+  useDashboardSocket();
 
   // Fetch tickets for active agent/admin
   const { data, isLoading, isError, error, refetch } = useTicketsQuery({

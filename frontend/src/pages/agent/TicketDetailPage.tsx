@@ -13,7 +13,8 @@ import {
   useUpdateTicketStatusMutation,
   useReassignTicketMutation,
   useAiDraftMutation,
-} from '../../features/tickets/hooks/useTickets';
+  useTicketSocket,
+} from '../../features/tickets';
 import { useAgentsQuery } from '../../features/agents/hooks/useAgents';
 import { AiAssistantPanel } from '../../features/tickets';
 import {
@@ -33,6 +34,9 @@ export function TicketDetailPage() {
   const { ticketId } = useParams<{ ticketId: string }>();
   const { user } = useAuthStore();
   const { replyDrafts, setReplyDraft, clearReplyDraft } = useUiStore();
+
+  // Real-time WebSocket synchronization
+  useTicketSocket({ ticketId });
 
   // 1. Query Ticket Details
   const {
